@@ -32,18 +32,18 @@ pkg-config = "*"
 coreutils = "*"
 
 [activation]
-# Source the colcon overlay (built by `pixi run build`) so workspace packages
-# such as oomwoo_sim are on the ROS 2 package path. No-ops before the first build.
+# On activation: (1) strip any host-ROS contamination from path env vars so a
+# system ROS doesn't crash Gazebo, and (2) source the colcon overlay (built by
+# `pixi run build`) so workspace packages such as oomwoo_sim are on the ROS 2
+# package path. No-ops before the first build. See docs/pixi-environment.md.
 scripts = ["scripts/pixi-activate-overlay.sh"]
 
 [tasks]
-# NOTE: if you have a system ROS sourced in your shell, run tasks with
-#   pixi run --clean-env <task>
-# to avoid host ROS env vars leaking in and crashing Gazebo. See docs/pixi-environment.md.
+# A system ROS in your shell is handled automatically by the activation script,
+# so plain `pixi run <task>` works. See docs/pixi-environment.md.
 
 # Build the ROS 2 packages under ./src (oomwoo_urdf description + oomwoo_sim bringup).
-# Use the Ninja generator (shipped in the env) so builds work under --clean-env,
-# where the host's `make` is not on PATH.
+# Use the Ninja generator (shipped in the env) so builds don't depend on a host `make`.
 build = { cmd = "colcon build --symlink-install --cmake-args -G Ninja", inputs = ["src"] }
 test = { cmd = "colcon test --ctest-args --output-on-failure", depends-on = ["build"] }
 

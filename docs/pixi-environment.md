@@ -47,26 +47,25 @@ The lockfile resolves for:
    pixi run ros2 topic list
    ```
 
-## Already have a system ROS installed? (important)
+## Already have a system ROS installed?
 
 If your shell sources a system ROS (e.g. `source /opt/ros/<distro>/setup.bash` in your
-`~/.bashrc`), those environment variables (`GZ_CONFIG_PATH`, `LD_LIBRARY_PATH`,
-`AMENT_PREFIX_PATH`, `PYTHONPATH`, …) **leak into the pixi environment and mix incompatible
-libraries** — Gazebo in particular will load the system's version and crash. Symptoms:
-`gz sim` aborts, or launch files report a Gazebo "version error".
+`~/.bashrc`), its environment variables (`GZ_CONFIG_PATH`, `LD_LIBRARY_PATH`,
+`AMENT_PREFIX_PATH`, `PYTHONPATH`, …) would otherwise **leak into the pixi environment and mix
+incompatible libraries** — Gazebo especially would load the system's version and crash.
 
-Run pixi tasks in a **clean environment** to isolate them from your host ROS:
+This is handled automatically: on activation, `scripts/pixi-activate-overlay.sh` strips those
+leaked entries so each path variable points only at the pixi environment (and pins
+`GZ_CONFIG_PATH` to this env's Gazebo). So plain `pixi run <task>` just works, and the Gazebo
+GUI still opens (your `DISPLAY` is left untouched). No `--clean-env` needed.
 
-```
-pixi run --clean-env <task>          # e.g. pixi run --clean-env sim
-```
-
-Fresh machines, CI, and a clean Raspberry Pi image are unaffected and don't need this flag.
+> If you ever want a hard guarantee of isolation you can still use `pixi run --clean-env <task>`,
+> but note it also strips `DISPLAY`, so the Gazebo GUI won't open under it — use `headless:=true`
+> in that case.
 
 ## Tasks
 
-Defined in `pixi.toml`, run with `pixi run <task>` (add `--clean-env` if you have a system ROS,
-see above):
+Defined in `pixi.toml`, run with `pixi run <task>`:
 
 | Task        | What it does                                                              |
 |-------------|--------------------------------------------------------------------------|
@@ -85,17 +84,16 @@ plus a bringup package (`src/oomwoo_sim`) with a launch file and a walled-room w
 
 ```
 pixi run build                       # once (and after editing src/)
-pixi run --clean-env sim             # terminal 1: Gazebo + robot + LiDAR + bridge
-pixi run --clean-env teleop          # terminal 2: drive with the i/j/k/l keys
+pixi run sim                         # terminal 1: Gazebo + robot + LiDAR + bridge
+pixi run teleop                      # terminal 2: drive with the i/j/k/l keys
 ```
 
-- Use `--clean-env` if you have a system ROS installed (see the section above). The robot
+- A system ROS on your machine is handled automatically (see the section above). The robot
   driving and the 2D LiDAR (`/scan`) work **headless** — no display required.
 - The **Gazebo GUI and RViz** need a display (`DISPLAY`). For the full visual experience run
-  `pixi run --clean-env rviz` (or `sim`) on a machine with a screen; on a Raspberry Pi use its
-  desktop session.
-- Extra launch args: `pixi run --clean-env sim headless:=true` (server only),
-  `... rviz:=true`, or `... world:=/path/to/your.sdf`.
+  `pixi run rviz` (or `sim`) on a machine with a screen; on a Raspberry Pi use its desktop session.
+- Extra launch args: `pixi run sim headless:=true` (server only),
+  `pixi run sim rviz:=true`, or `pixi run sim world:=/path/to/your.sdf`.
 
 Bridged topics: `/cmd_vel` (in), `/odom`, `/tf`, `/scan`, `/joint_states`, `/clock`.
 
