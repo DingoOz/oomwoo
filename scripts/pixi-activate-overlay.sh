@@ -67,6 +67,15 @@ if [ -n "${CONDA_PREFIX:-}" ]; then
 fi
 unset -f _oomwoo_filter_path 2>/dev/null || true
 
+# Build the fontconfig cache once per solved env. pixi skips conda post-link
+# scripts by default, so the fonts package's own fc-cache never runs; without a
+# valid cache, Qt GUIs (the Gazebo GUI, RViz) segfault in fontconfig while
+# laying out text. Stamped so this only runs once per environment.
+if [ -n "${CONDA_PREFIX:-}" ] && [ ! -e "${CONDA_PREFIX}/.oomwoo-fc-cache" ] \
+        && command -v fc-cache >/dev/null 2>&1; then
+    fc-cache >/dev/null 2>&1 && : > "${CONDA_PREFIX}/.oomwoo-fc-cache" 2>/dev/null || true
+fi
+
 # 2. Source the colcon overlay if it has been built.
 if [ -n "${PIXI_PROJECT_ROOT:-}" ] && [ -f "${PIXI_PROJECT_ROOT}/install/setup.sh" ]; then
     . "${PIXI_PROJECT_ROOT}/install/setup.sh"
