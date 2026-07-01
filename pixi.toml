@@ -30,6 +30,9 @@ pkg-config = "*"
 # Core CLI utilities (env, etc.) so `pixi run --clean-env <task>` is self-contained
 # even when the host's /usr/bin is excluded from PATH.
 coreutils = "*"
+# Fonts + fontconfig bootstrap for the conda env. Without this the Gazebo GUI
+# (Qt) segfaults in fontconfig laying out toolbar text (no fonts configured).
+fonts-conda-ecosystem = "*"
 
 [activation]
 # On activation: (1) strip any host-ROS contamination from path env vars so a
