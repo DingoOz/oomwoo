@@ -1,2 +1,11 @@
 .private/
 .claude/
+CLAUDE.md
+
+# pixi: commit pixi.lock (reproducibility), ignore the solved environment
+.pixi/
+
+# colcon build outputs (the workspace sources under src/ are tracked)
+build/
+install/
+log/

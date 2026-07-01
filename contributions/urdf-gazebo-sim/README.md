@@ -21,6 +21,7 @@ including a front bumper.
 - review, reproduce [Gazebo Simulation Instructions](https://makerspet.com/blog/tutorial-map-navigate-ros2-robot-in-simulation/)
   - review [development environment setup instructions](https://makerspet.com/blog/build-arduino-self-driving-robot-video-instructions/)
   - use this [oomwoo ROS2 development](https://github.com/makerspet/oomwoo-install) to build oomwoo ROS2 Docker image(s) with your packages
+  - or, as a lighter-weight alternative, use the repo's [pixi ROS2 environment](../../docs/pixi-environment.md), which already includes a **working drivable Gazebo sim** to build on: `pixi install && pixi run build`, then `pixi run --clean-env sim` and `pixi run --clean-env teleop` (see [docs/pixi-environment.md → Drive the robot](../../docs/pixi-environment.md#drive-the-robot-teleop-simulation)). The robot description and bringup live in `src/oomwoo_urdf` and `src/oomwoo_sim`.
 - test it well
   - verify Nav2 SLAM works, does not get stuck in the Living Room world
 - submit a PR (pull request) to `contributions/urdf-gazebo-sim/<your-github-username>/`

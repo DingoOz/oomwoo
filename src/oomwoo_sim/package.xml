@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>oomwoo_sim</name>
+  <version>0.1.0</version>
+  <description>
+    Gazebo (gz-sim) bringup for the oomwoo robot vacuum: launch files, a walled-room world,
+    and teleop wiring on top of the makerspet_mini description.
+  </description>
+  <maintainer email="nigel.hungerfordsymes@gmail.com">oomwoo contributors</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Robot description (vendored in ../oomwoo_urdf) -->
+  <exec_depend>makerspet_mini</exec_depend>
+
+  <!-- Simulation + bridge + description publishing -->
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+
+  <!-- Teleop -->
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

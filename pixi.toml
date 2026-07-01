@@ -1,0 +1,58 @@
+# Reproducible ROS2 (Lyrical Luth) development environment for oomwoo.
+#
+# This is an ADDITIVE alternative to the Docker-based setup in the separate
+# makerspet/oomwoo-install repo — no system ROS install and no Docker required.
+# Run `pixi install` to get a byte-for-byte identical ROS2 + Gazebo toolchain
+# pinned by pixi.lock. See docs/pixi-environment.md for usage.
+#
+# ROS2 packages come from RoboStack (https://robostack.github.io) via the
+# prefix.dev channel. Verified available for all three platforms below on
+# 2026-07-01: ros-lyrical-desktop 0.13.0.
+
+[workspace]
+name = "oomwoo"
+version = "0.1.0"
+description = "Reproducible ROS2 (Lyrical Luth) dev environment for the oomwoo robot vacuum"
+channels = ["conda-forge", "https://prefix.dev/robostack-lyrical"]
+platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
+
+[dependencies]
+# ROS2 Lyrical Luth desktop metapackage (rclcpp/rclpy, rviz, demos, TF, etc.)
+ros-lyrical-desktop = "*"
+# Gazebo simulation + ros_gz bridge (pulls ros-gz-sim / -bridge / -image / -interfaces)
+ros-lyrical-ros-gz = "*"
+# colcon build tooling and a C/C++ toolchain for building ROS packages
+colcon-common-extensions = "*"
+compilers = "*"
+cmake = "<4"
+ninja = "*"
+pkg-config = "*"
+# Core CLI utilities (env, etc.) so `pixi run --clean-env <task>` is self-contained
+# even when the host's /usr/bin is excluded from PATH.
+coreutils = "*"
+
+[activation]
+# Source the colcon overlay (built by `pixi run build`) so workspace packages
+# such as oomwoo_sim are on the ROS 2 package path. No-ops before the first build.
+scripts = ["scripts/pixi-activate-overlay.sh"]
+
+[tasks]
+# NOTE: if you have a system ROS sourced in your shell, run tasks with
+#   pixi run --clean-env <task>
+# to avoid host ROS env vars leaking in and crashing Gazebo. See docs/pixi-environment.md.
+
+# Build the ROS 2 packages under ./src (oomwoo_urdf description + oomwoo_sim bringup).
+# Use the Ninja generator (shipped in the env) so builds work under --clean-env,
+# where the host's `make` is not on PATH.
+build = { cmd = "colcon build --symlink-install --cmake-args -G Ninja", inputs = ["src"] }
+test = { cmd = "colcon test --ctest-args --output-on-failure", depends-on = ["build"] }
+
+# Drive the oomwoo robot in a walled room. Run `pixi run teleop` in a second
+# terminal to steer it. Add rviz:=true or headless:=true as launch args.
+sim = { cmd = "ros2 launch oomwoo_sim sim.launch.py", depends-on = ["build"] }
+# Keyboard teleop -> publishes geometry_msgs/Twist on /cmd_vel.
+teleop = { cmd = "ros2 run teleop_twist_keyboard teleop_twist_keyboard", depends-on = ["build"] }
+# Same sim, with RViz (LiDAR + TF view).
+rviz = { cmd = "ros2 launch oomwoo_sim sim.launch.py rviz:=true", depends-on = ["build"] }
+# Bare empty-world smoke test of the raw Gazebo stack (no robot).
+sim-empty = "ros2 launch ros_gz_sim gz_sim.launch.py"

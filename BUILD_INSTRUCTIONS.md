@@ -20,6 +20,8 @@
   instructions land.
 - 🛠️ **Contribute:** pick a module from the [RFC list](README.md#requests-for-contributions)
   and dive in — every skill level welcome.
+- 🧪 **Spin up ROS2 locally:** a reproducible [pixi ROS2 environment](docs/pixi-environment.md)
+  (ROS2 Lyrical + Gazebo, one `pixi install`) is available for working on the sim/URDF modules.
 - 💬 **Join the community:** [Discord](https://discord.gg/3y2JKz5T25) and
   [GitHub Discussions](https://github.com/makerspet/oomwoo/discussions).
 - 📺 **Follow the build in public:** [YouTube](https://www.youtube.com/@makerspet).
