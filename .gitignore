@@ -9,3 +9,7 @@ CLAUDE.md
 build/
 install/
 log/
+
+# local test logs
+log_test.txt
+*.log
